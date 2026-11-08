@@ -1,0 +1,72 @@
+# e-HadirGo — local stack: MySQL 8 + PHP 8.3/Apache.
+#
+#   docker compose up -d --build
+#   open http://localhost:8080
+#
+# First boot creates the schema and loads the demo roster automatically.
+# Set RUN_SEED=0 to start with an empty database.
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-ehadirgo}
+      MYSQL_USER: ${DB_USER:-ehadirgo}
+      MYSQL_PASSWORD: ${DB_PASS:-ehadirgo}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootpass}
+      TZ: Asia/Kuching
+    ports:
+      # 3307 on the host so a local MySQL on 3306 is left alone.
+      - "3307:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: ${DB_NAME:-ehadirgo}
+      DB_USER: ${DB_USER:-ehadirgo}
+      DB_PASS: ${DB_PASS:-ehadirgo}
+
+      # Development only: shows the OTP and reset link on screen.
+      APP_DEBUG: ${APP_DEBUG:-1}
+      APP_SECRET: ${APP_SECRET:-dev-only-change-me}
+
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
+      RUN_SEED: ${RUN_SEED:-1}
+
+      # Optional integrations — leave empty to log failures only.
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
+      TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@sabah.gov.my}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-e-HadirGo}
+    ports:
+      - "8080:80"
+    volumes:
+      # Live code — edits on the host appear on refresh.
+      - .:/var/www/html
+
+volumes:
+  mysqldata:

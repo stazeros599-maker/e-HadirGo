@@ -1,0 +1,16 @@
+# Local credentials and environment
+db/db.local.php
+.env
+.env.local
+
+# Runtime
+*.log
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/

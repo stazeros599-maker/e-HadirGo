@@ -1,0 +1,15 @@
+# Only needed if the document root points at the project folder instead of public/.
+# Preferred setup: point the web root at public/ and ignore this file.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Never serve application code or SQL over HTTP.
+    RewriteRule ^(app|db|lang|cron|tests)/ - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

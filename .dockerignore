@@ -1,0 +1,8 @@
+.git
+.gitignore
+**/.DS_Store
+*.md
+tests/
+docker-compose.yml
+.env
+.dsh-office-*
