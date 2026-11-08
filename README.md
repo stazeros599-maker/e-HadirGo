@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # e-HadirGo
 
 Staff field-attendance with location verification for Jabatan Perikanan Sabah.
@@ -253,3 +254,6 @@ php tests/assignment_access_test.php  # participant attendance visibility
 php tests/language_selection_test.php  # language override persistence
 php tests/attendance_actions_test.php  # check-out and optional review note
 ```
+=======
+# e-HadirGo
+>>>>>>> a7cea8774dcbc5542de366fbc09a22de859a087a
